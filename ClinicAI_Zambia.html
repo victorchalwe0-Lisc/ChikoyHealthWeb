@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ClinicAI Zambia — Clinical Intelligence & QI Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --bg:#060e1a;--surface:#0d1824;--card:#111e2e;--border:#1a3352;
+  --accent:#00c8f0;--green:#10b981;--amber:#f59e0b;--red:#ef4444;
+  --purple:#8b5cf6;--pink:#ec4899;--orange:#f97316;--teal:#14b8a6;
+  --zgreen:#198c37;--zgold:#de9a18;
+  --text:#e2e8f0;--muted:#5a7a9a;--white:#fff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;font-size:14px}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--surface)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ── Layout ── */
+#app{display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100}
+.topbar-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;height:56px;gap:14px}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--zgreen),var(--zgold));display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:15px}
+.logo-sub{font-size:9px;color:var(--muted);line-height:1}
+.nav-scroll{flex:1;overflow-x:auto;display:flex;gap:3px;align-items:center;padding-bottom:2px}
+.nav-scroll::-webkit-scrollbar{height:0}
+.nav-group{display:flex;gap:2px;align-items:center}
+.nav-divider{width:1px;height:24px;background:var(--border);margin:0 4px}
+.nav-btn{background:transparent;border:1px solid transparent;border-radius:7px;padding:5px 11px;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;font-size:11.5px;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:5px}
+.nav-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.nav-btn.active{color:var(--accent);background:rgba(0,200,240,.1);border-color:rgba(0,200,240,.3)}
+.nav-btn.active.qi{color:var(--zgreen);background:rgba(25,140,55,.1);border-color:rgba(25,140,55,.3)}
+
+.theme-bar{background:linear-gradient(90deg,rgba(25,140,55,.15),rgba(222,154,24,.07),transparent);border-bottom:1px solid rgba(25,140,55,.2);padding:6px 20px;display:flex;align-items:center;gap:10px;font-size:11px}
+.theme-label{color:var(--zgreen);font-weight:600}
+.theme-text{color:var(--text)}
+
+.main{flex:1;max-width:1400px;width:100%;margin:0 auto;padding:24px 20px}
+.page{display:none;animation:fadein .3s ease}
+.page.active{display:block}
+
+/* ── Cards & UI ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:13px;padding:20px;margin-bottom:14px}
+.card.glow{box-shadow:0 0 20px rgba(0,200,240,.12)}
+.sec-title{display:flex;align-items:center;gap:9px;margin-bottom:16px}
+.sec-title-icon{font-size:20px}
+.sec-title-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:700}
+.sec-subtitle{font-size:11px;color:var(--muted);margin-top:2px;margin-left:29px}
+label.lbl{display:block;color:var(--muted);font-size:10.5px;letter-spacing:.4px;margin-bottom:4px;text-transform:uppercase}
+input,textarea,select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Inter',sans-serif;font-size:13px;outline:none;transition:border .2s;color-scheme:dark}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+textarea{resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.btn{background:rgba(0,200,240,.12);color:var(--accent);border:1px solid rgba(0,200,240,.35);border-radius:8px;padding:9px 18px;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;font-size:13px;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:rgba(0,200,240,.2)}
+.btn:disabled{background:rgba(255,255,255,.04);color:var(--muted);border-color:var(--border);cursor:not-allowed}
+.btn.pink{background:rgba(236,72,153,.12);color:var(--pink);border-color:rgba(236,72,153,.35)}
+.btn.green{background:rgba(16,185,129,.12);color:var(--green);border-color:rgba(16,185,129,.35)}
+.btn.amber{background:rgba(245,158,11,.12);color:var(--amber);border-color:rgba(245,158,11,.35)}
+.btn.red{background:rgba(239,68,68,.12);color:var(--red);border-color:rgba(239,68,68,.35)}
+.btn.purple{background:rgba(139,92,246,.12);color:var(--purple);border-color:rgba(139,92,246,.35)}
+.btn.teal{background:rgba(20,184,166,.12);color:var(--teal);border-color:rgba(20,184,166,.35)}
+.btn.zgreen{background:rgba(25,140,55,.15);color:var(--zgreen);border-color:rgba(25,140,55,.4)}
+.badge{display:inline-flex;align-items:center;background:rgba(0,200,240,.12);color:var(--accent);border:1px solid rgba(0,200,240,.3);border-radius:20px;padding:2px 9px;font-size:10.5px;font-weight:600}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top:2px solid var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:14px;text-align:center}
+.stat-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:3px}
+.stat-lbl{font-size:10.5px;color:var(--muted)}
+.progress-bar{background:var(--surface);border-radius:20px;height:7px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;border-radius:20px;transition:width .5s ease}
+.sub-tabs{display:flex;gap:4px;background:var(--surface);border-radius:10px;padding:4px;margin-bottom:14px;flex-wrap:wrap}
+.sub-tab{flex:1;min-width:80px;background:transparent;border:1px solid transparent;border-radius:7px;padding:6px 10px;cursor:pointer;font-family:'Inter',sans-serif;font-size:11.5px;color:var(--muted);transition:all .2s;text-align:center}
+.sub-tab.active{background:rgba(236,72,153,.12);color:var(--pink);border-color:rgba(236,72,153,.35);font-weight:600}
+.sub-tab.active.zgreen{background:rgba(25,140,55,.12);color:var(--zgreen);border-color:rgba(25,140,55,.35)}
+.sub-tab.active.red{background:rgba(239,68,68,.12);color:var(--red);border-color:rgba(239,68,68,.35)}
+.sub-tab.active.teal{background:rgba(20,184,166,.12);color:var(--teal);border-color:rgba(20,184,166,.35)}
+.sub-tab.active.zstar{background:rgba(25,140,55,.12);color:var(--zgreen);border-color:rgba(25,140,55,.35)}
+.sms-item{background:var(--surface);border-radius:9px;padding:11px;margin-bottom:7px;border-left:3px solid var(--accent)}
+.incident-item{background:var(--surface);border-radius:9px;padding:12px;margin-bottom:8px}
+.chat-bubble{max-width:74%;padding:10px 14px;border-radius:12px;margin-bottom:10px;font-size:13px;line-height:1.6;white-space:pre-wrap}
+.chat-bubble.user{background:rgba(0,200,240,.12);border:1px solid rgba(0,200,240,.25);margin-left:auto}
+.chat-bubble.ai{background:var(--surface);border:1px solid var(--border)}
+.chat-time{font-size:9.5px;color:var(--muted);margin-top:4px;text-align:right}
+.footer{text-align:center;padding:14px;color:var(--muted);font-size:10.5px;border-top:1px solid var(--border)}
+
+/* ── Audit ── */
+.audit-row{background:var(--surface);border-radius:8px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:5px}
+.audit-row span{font-size:12.5px;flex:1}
+.audit-btns{display:flex;gap:4px}
+.audit-opt{background:transparent;border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;font-size:11px;color:var(--muted);transition:all .2s}
+.audit-opt.yes{background:rgba(16,185,129,.15);color:var(--green);border-color:rgba(16,185,129,.4)}
+.audit-opt.no{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.4)}
+.audit-opt.na{background:rgba(90,122,154,.15);color:var(--muted);border-color:rgba(90,122,154,.4)}
+
+/* ── Feedback stars ── */
+.star-row{display:flex;gap:5px}
+.star-btn{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;cursor:pointer;font-size:11px;text-align:center;transition:all .2s;color:var(--muted)}
+.star-btn.sel{background:rgba(25,140,55,.15);border-color:rgba(25,140,55,.4);color:var(--zgreen)}
+
+/* ── Delay checkboxes ── */
+.delay-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;cursor:pointer;font-size:12.5px;display:flex;align-items:center;gap:9px;margin-bottom:5px;transition:all .2s}
+.delay-row.sel{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.4);color:var(--text)}
+.delay-check{width:14px;height:14px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800}
+.delay-check.sel{background:var(--red);border-color:var(--red);color:white}
+
+/* ── Chat ── */
+.chat-wrap{height:340px;overflow-y:auto;padding:14px;display:flex;flex-direction:column}
+.chat-empty{text-align:center;color:var(--muted);font-size:13px;margin:auto}
+.doc-card{padding:10px 9px;border-radius:9px;cursor:pointer;margin-bottom:5px;transition:all .2s;border:1px solid transparent}
+.doc-card:hover{background:rgba(255,255,255,.03)}
+.doc-card.sel{background:rgba(0,200,240,.08);border-color:rgba(0,200,240,.3)}
+
+/* ── Resp ── */
+@media(max-width:640px){
+  .grid2{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr}
+  .main{padding:16px 12px}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="logo">
+      <div class="logo-icon">⚕</div>
+      <div>
+        <div class="logo-text">ClinicAI <span style="color:var(--zgreen)">Zambia</span></div>
+        <div class="logo-sub">Clinical Intelligence & QI Platform</div>
+      </div>
+    </div>
+    <div class="nav-scroll">
+      <div class="nav-group" id="nav-clinical"></div>
+      <div class="nav-divider"></div>
+      <div class="nav-group" id="nav-qi"></div>
+    </div>
+  </div>
+</div>
+
+<!-- THEME BAR -->
+<div class="theme-bar">
+  <span>🇿🇲</span>
+  <span class="theme-label">2025/26 QI THEME:</span>
+  <span class="theme-text">Inspiring and Driving Improvement in the Quality and Safety of Healthcare Services in Zambia</span>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- ══ PAGE: CERVICAL ════════════════════════════════ -->
+  <div class="page active" id="page-cervical">
+    <div class="sec-title"><span class="sec-title-icon">🔬</span><div><div class="sec-title-text">Cervical Cancer AI Screening</div><div class="sec-subtitle">AI-assisted risk stratification — not a substitute for PAP smear or physician diagnosis</div></div></div>
+    <div class="card">
+      <div class="grid2" style="margin-bottom:12px">
+        <div><label class="lbl">Patient Age</label><input type="number" id="cx-age" placeholder="e.g. 34"/></div>
+        <div><label class="lbl">Last PAP / HPV Test</label><input type="text" id="cx-hist" placeholder="e.g. 2 years ago, normal"/></div>
+      </div>
+      <label class="lbl">Symptoms & Clinical Presentation</label>
+      <textarea id="cx-symptoms" rows="4" placeholder="Abnormal bleeding, discharge, pelvic pain, HPV status, prior abnormal results, smoking, immunosuppression…" style="margin-bottom:12px"></textarea>
+      <button class="btn purple" onclick="runCervical()"><span id="cx-btn-icon">🔬</span> <span id="cx-btn-txt">Run AI Screening</span></button>
+    </div>
+    <div id="cx-result"></div>
+  </div>
+
+  <!-- ══ PAGE: DRUGS ════════════════════════════════════ -->
+  <div class="page" id="page-drugs">
+    <div class="sec-title"><span class="sec-title-icon">💊</span><div><div class="sec-title-text">Drug Interaction Checker</div><div class="sec-subtitle">AI-powered screening to prevent adverse drug events and medication errors</div></div></div>
+    <div class="card">
+      <label class="lbl">Medications (comma-separated)</label>
+      <textarea id="drug-meds" rows="3" placeholder="e.g. Warfarin 5mg, Aspirin 81mg, Metformin 500mg, Cotrimoxazole, ARVs…" style="margin-bottom:12px"></textarea>
+      <label class="lbl">Patient Conditions</label>
+      <input type="text" id="drug-cond" placeholder="e.g. Diabetes, HIV, Hypertension, Pregnancy, Renal Impairment" style="margin-bottom:12px"/>
+      <button class="btn amber" onclick="runDrugs()"><span id="drug-btn-icon">💊</span> <span id="drug-btn-txt">Check Interactions</span></button>
+    </div>
+    <div id="drug-result"></div>
+  </div>
+
+  <!-- ══ PAGE: IMMUNIZATION ════════════════════════════ -->
+  <div class="page" id="page-immunization">
+    <div class="sec-title"><span class="sec-title-icon">💉</span><div><div class="sec-title-text">Child Immunization SMS Reminders</div><div class="sec-subtitle">Zambia EPI schedule — automated vaccination SMS notifications</div></div></div>
+    <div class="card">
+      <div class="grid2">
+        <div><label class="lbl">Child Name</label><input type="text" id="imm-child" placeholder="e.g. Baby Mwansa"/></div>
+        <div><label class="lbl">Guardian/Mother</label><input type="text" id="imm-guardian" placeholder="e.g. Grace Mutale"/></div>
+        <div><label class="lbl">Date of Birth</label><input type="date" id="imm-dob"/></div>
+        <div><label class="lbl">Phone (Zambia)</label><input type="text" id="imm-phone" placeholder="+260 9XX XXX XXX"/></div>
+      </div>
+    </div>
+    <div id="imm-vaccines"></div>
+    <div id="imm-smslog" style="margin-top:14px"></div>
+  </div>
+
+  <!-- ══ PAGE: MATERNAL ════════════════════════════════ -->
+  <div class="page" id="page-maternal">
+    <div class="sec-title"><span class="sec-title-icon">🤰</span><div><div class="sec-title-text">Maternal Health Module</div><div class="sec-subtitle">Antenatal & postnatal care scheduling with AI appointment SMS reminders — Zambia MoH aligned</div></div></div>
+    <div class="sub-tabs" id="mat-tabs">
+      <button class="sub-tab active" onclick="matTab('register',this)">👤 Register</button>
+      <button class="sub-tab" onclick="matTab('anc',this)">🏥 ANC Visits</button>
+      <button class="sub-tab" onclick="matTab('pnc',this)">👶 PNC Visits</button>
+      <button class="sub-tab" onclick="matTab('custom',this)">📅 Custom</button>
+      <button class="sub-tab" onclick="matTab('smslog',this)" id="mat-smslog-tab">💬 SMS Log (0)</button>
+    </div>
+    <div id="mat-content"></div>
+  </div>
+
+  <!-- ══ PAGE: CHAT ═════════════════════════════════════ -->
+  <div class="page" id="page-chat">
+    <div class="sec-title"><span class="sec-title-icon">💬</span><div><div class="sec-title-text">Doctors Consultation Chat</div><div class="sec-subtitle">Secure clinical peer consultation — Zambia referral network</div></div></div>
+    <div style="display:grid;grid-template-columns:190px 1fr;gap:14px">
+      <div class="card" style="padding:12px">
+        <label class="lbl">Specialists</label>
+        <div id="doc-list"></div>
+      </div>
+      <div class="card" style="padding:0;display:flex;flex-direction:column;min-height:480px">
+        <div id="chat-header" style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px"></div>
+        <div class="chat-wrap" id="chat-messages"><div class="chat-empty" id="chat-empty">Select a specialist and start a consultation</div></div>
+        <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:8px">
+          <input type="text" id="chat-input" placeholder="Describe the clinical case…" onkeydown="if(event.key==='Enter')sendChat()"/>
+          <button class="btn" onclick="sendChat()" id="chat-send-btn">Send ↵</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: SAFETY ═══════════════════════════════════ -->
+  <div class="page" id="page-safety">
+    <div class="sec-title"><span class="sec-title-icon">🛡️</span><div><div class="sec-title-text">Patient Safety Incident Reporter</div><div class="sec-subtitle">Log, analyse, and act on adverse events, near-misses & medication errors — Zambia MoH aligned</div></div></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active red" onclick="safetyTab('report',this)">📋 Report Incident</button>
+      <button class="sub-tab red" onclick="safetyTab('analysis',this)">🔍 AI Root Cause</button>
+      <button class="sub-tab red" onclick="safetyTab('log',this)" id="safety-log-tab">📁 Incident Log (0)</button>
+    </div>
+    <div id="safety-content"></div>
+  </div>
+
+  <!-- ══ PAGE: AUDIT ════════════════════════════════════ -->
+  <div class="page" id="page-audit">
+    <div class="sec-title"><span class="sec-title-icon">📋</span><div><div class="sec-title-text">Clinical Audit Tool</div><div class="sec-subtitle">Zambia MoH standard-based audits with AI improvement recommendations</div></div></div>
+    <div id="audit-content"></div>
+  </div>
+
+  <!-- ══ PAGE: MDR ══════════════════════════════════════ -->
+  <div class="page" id="page-mdr">
+    <div class="sec-title"><span class="sec-title-icon">🌸</span><div><div class="sec-title-text">Maternal Death Review (MDR)</div><div class="sec-subtitle">Structured near-miss and maternal death review — Zambia MoH MDR protocol & Three Delays Framework</div></div></div>
+    <div id="mdr-content"></div>
+  </div>
+
+  <!-- ══ PAGE: FEEDBACK ════════════════════════════════ -->
+  <div class="page" id="page-feedback">
+    <div class="sec-title"><span class="sec-title-icon">⭐</span><div><div class="sec-title-text">Patient Feedback & Satisfaction</div><div class="sec-subtitle">Digital exit survey with AI sentiment analysis and QI recommendations</div></div></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active zstar" onclick="fbTab('survey',this)">📝 Survey</button>
+      <button class="sub-tab zstar" onclick="fbTab('results',this)" id="fb-results-tab">📊 Results (0)</button>
+      <button class="sub-tab zstar" onclick="fbTab('ai',this)">🤖 AI Analysis</button>
+    </div>
+    <div id="fb-content"></div>
+  </div>
+
+</div><!-- /main -->
+
+<div class="footer">⚕ ClinicAI Zambia · AI-assisted clinical & QI tools · Always validate with qualified medical professionals · 🇿🇲 Zambia MoH Aligned</div>
+</div>
+
+<script>
+// ══ CONFIG ════════════════════════════════════════════════════
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL   = 'claude-sonnet-4-20250514';
+
+// ══ STATE ════════════════════════════════════════════════════
+const state = {
+  currentPage: 'cervical',
+  immScheduled: new Set(),
+  immLog: [],
+  matTab: 'register',
+  matMom: { name:'',age:'',phone:'',lmp:'',gravida:'',para:'',facility:'',clinician:'' },
+  matDoneANC: new Set(),
+  matDonePNC: new Set(),
+  matSmsLog: [],
+  matCustLog: [],
+  chatDoctor: null,
+  chatHistory: { 1:[],2:[],3:[],4:[] },
+  chatLoading: false,
+  safetyTab: 'report',
+  safetyIncidents: [],
+  safetyLastAnalysis: null,
+  auditArea: 'Maternity Care',
+  auditScores: {},
+  auditAuditor: { name:'',facility:'',ward:'',date:'' },
+  auditResult: null,
+  mdrDelays: new Set(),
+  mdrSubmitted: [],
+  mdrResult: null,
+  fbTab: 'survey',
+  fbForm: { facility:'',ward:'',date:'',q1:'',q2:'',q3:'',q4:'',q5:'',comments:'' },
+  fbResponses: [],
+  fbAnalysis: null,
+};
+
+// ══ AI HELPER ════════════════════════════════════════════════
+async function callAI(system, userMsg, maxTokens=900) {
+  const res = await fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ model:MODEL, max_tokens:maxTokens, system, messages:[{role:'user',content:userMsg}] })
+  });
+  const data = await res.json();
+  const text = data.content?.find(b=>b.type==='text')?.text || '{}';
+  return text.replace(/```json|```/g,'').trim();
+}
+
+// ══ NAVIGATION ═══════════════════════════════════════════════
+const CLINICAL_NAV = [
+  {id:'cervical', label:'Cervical Screening', icon:'🔬'},
+  {id:'drugs',    label:'Drug Interactions', icon:'💊'},
+  {id:'immunization', label:'Child Immunization', icon:'💉'},
+  {id:'maternal', label:'Maternal Health', icon:'🤰'},
+  {id:'chat',     label:'Doctors Chat', icon:'💬'},
+];
+const QI_NAV = [
+  {id:'safety',   label:'Patient Safety', icon:'🛡️'},
+  {id:'audit',    label:'Clinical Audit', icon:'📋'},
+  {id:'mdr',      label:'Maternal Death Review', icon:'🌸'},
+  {id:'feedback', label:'Patient Feedback', icon:'⭐'},
+];
+
+function buildNav() {
+  const cg = document.getElementById('nav-clinical');
+  const qg = document.getElementById('nav-qi');
+  CLINICAL_NAV.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'nav-btn' + (t.id===state.currentPage ? ' active' : '');
+    b.id = 'nav-'+t.id;
+    b.innerHTML = t.icon+' '+t.label;
+    b.onclick = () => navigate(t.id);
+    cg.appendChild(b);
+  });
+  QI_NAV.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'nav-btn' + (t.id===state.currentPage ? ' active qi' : '');
+    b.id = 'nav-'+t.id;
+    b.innerHTML = t.icon+' '+t.label;
+    b.onclick = () => navigate(t.id);
+    qg.appendChild(b);
+  });
+}
+
+function navigate(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active','qi'));
+  const btn = document.getElementById('nav-'+id);
+  if(btn){ btn.classList.add('active'); if(QI_NAV.find(q=>q.id===id)) btn.classList.add('qi'); }
+  state.currentPage = id;
+  if(id==='immunization') renderImmVaccines();
+  if(id==='maternal') renderMatContent();
+  if(id==='chat') renderChat();
+  if(id==='safety') renderSafety();
+  if(id==='audit') renderAudit();
+  if(id==='mdr') renderMDR();
+  if(id==='feedback') renderFeedback();
+}
+
+// ══ HELPERS ══════════════════════════════════════════════════
+const C = { green:'var(--green)',amber:'var(--amber)',red:'var(--red)',purple:'var(--purple)',pink:'var(--pink)',accent:'var(--accent)',teal:'var(--teal)',zgreen:'var(--zgreen)',zgold:'var(--zgold)',orange:'var(--orange)',muted:'var(--muted)' };
+const riskColor = r => ({Low:C.green,Moderate:C.amber,High:C.red,Critical:'#ff0044'})[r]||C.muted;
+const sevColor  = s => ({Minor:C.green,Moderate:C.amber,Major:C.red,Contraindicated:'#ff0044','Near Miss':C.green})[s]||C.muted;
+const triColor  = t => ({1:C.green,2:C.amber,3:C.pink})[t]||C.muted;
+const spin = () => `<span class="spinner"></span>`;
+const badge = (text,color=C.accent) => `<span class="badge" style="background:${color}18;color:${color};border-color:${color}44">${text}</span>`;
+const setHTML = (id,h) => { const el=document.getElementById(id); if(el) el.innerHTML=h; };
+const now = () => new Date().toLocaleTimeString();
+const edd = lmp => { if(!lmp)return null; const d=new Date(lmp); d.setDate(d.getDate()+280); return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'}); };
+const ga  = lmp => { if(!lmp)return null; const days=Math.floor((new Date()-new Date(lmp))/86400000); return `${Math.floor(days/7)}w ${days%7}d`; };
+
+// ══ MODULE 1 · CERVICAL ══════════════════════════════════════
+async function runCervical() {
+  const symptoms = document.getElementById('cx-symptoms').value.trim();
+  const age      = document.getElementById('cx-age').value;
+  const hist     = document.getElementById('cx-hist').value;
+  if(!symptoms){ alert('Please describe symptoms first.'); return; }
+  setHTML('cx-btn-icon',spin()); setHTML('cx-btn-txt','Analysing…');
+  document.querySelector('.btn.purple').disabled = true;
+  setHTML('cx-result','');
+  try {
+    const json = JSON.parse(await callAI(
+      `Clinical AI for cervical cancer screening in Zambia. Respond ONLY in JSON:
+{"riskLevel":"Low|Moderate|High|Critical","riskScore":0-100,"findings":["..."],"redFlags":[],"recommendations":["..."],"nextSteps":"paragraph","disclaimer":"AI aid only — PAP smear, HPV test and physician evaluation required."}`,
+      `Age:${age||'?'} LastTest:${hist||'None'} Symptoms:${symptoms}`
+    ));
+    const rc = riskColor(json.riskLevel);
+    let html = `<div class="card glow">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:72px;height:72px;border-radius:50%;border:3px solid ${rc};background:${rc}11;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <span style="font-size:20px;font-weight:800;color:${rc};font-family:'Syne',sans-serif">${json.riskScore}</span>
+          <span style="font-size:9px;color:var(--muted)">/100</span>
+        </div>
+        <div><label class="lbl">Risk Level</label>${badge(json.riskLevel,rc)}</div>
+      </div>`;
+    if(json.redFlags?.length) html+=`<div style="background:${C.red}11;border:1px solid ${C.red}33;border-radius:9px;padding:12px;margin-bottom:12px">
+      <div style="color:${C.red};font-size:11.5px;font-weight:600;margin-bottom:6px">⚠ Red Flags</div>
+      ${json.redFlags.map(f=>`<div style="font-size:12px;margin-bottom:3px">• ${f}</div>`).join('')}</div>`;
+    html+=`<div class="grid2" style="margin-bottom:12px">
+      <div><label class="lbl">Findings</label>${(json.findings||[]).map(f=>`<div style="font-size:12px;margin-bottom:4px"><span style="color:${C.accent}">◆</span> ${f}</div>`).join('')}</div>
+      <div><label class="lbl">Recommendations</label>${(json.recommendations||[]).map(r=>`<div style="font-size:12px;margin-bottom:4px"><span style="color:${C.green}">✓</span> ${r}</div>`).join('')}</div>
+    </div>
+    <div style="background:var(--surface);border-radius:8px;padding:12px;margin-bottom:10px"><label class="lbl">Next Steps</label><p style="font-size:12.5px;line-height:1.6">${json.nextSteps}</p></div>
+    <p style="font-size:10px;color:var(--muted);font-style:italic">⚕ ${json.disclaimer}</p></div>`;
+    setHTML('cx-result', html);
+  } catch(e){ setHTML('cx-result',`<div class="card"><p style="color:var(--red)">Analysis failed. Please try again.</p></div>`); }
+  setHTML('cx-btn-icon','🔬'); setHTML('cx-btn-txt','Run AI Screening');
+  document.querySelector('.btn.purple').disabled = false;
+}
+
+// ══ MODULE 2 · DRUGS ═════════════════════════════════════════
+async function runDrugs() {
+  const drugs = document.getElementById('drug-meds').value.trim();
+  const cond  = document.getElementById('drug-cond').value;
+  if(!drugs){ alert('Please enter medications first.'); return; }
+  setHTML('drug-btn-icon',spin()); setHTML('drug-btn-txt','Screening…');
+  document.querySelector('.btn.amber').disabled = true;
+  setHTML('drug-result','');
+  try {
+    const json = JSON.parse(await callAI(
+      `Clinical pharmacist AI in Zambia. Respond ONLY in JSON:
+{"interactions":[{"drugs":["A","B"],"severity":"Minor|Moderate|Major|Contraindicated","effect":"...","mechanism":"...","management":"..."}],"totalInteractions":0,"criticalCount":0,"overallRisk":"Low|Moderate|High|Critical","generalAdvice":"...","disclaimer":"..."}`,
+      `Medications:${drugs}\nConditions:${cond||'Not specified'}`
+    ));
+    const orc = ({Low:C.green,Moderate:C.amber,High:C.red,Critical:'#ff0044'})[json.overallRisk]||C.muted;
+    let html = `<div class="grid3" style="margin-bottom:12px">
+      <div class="stat-box"><div class="stat-val" style="color:${C.accent}">${json.totalInteractions}</div><div class="stat-lbl">Total Interactions</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${C.red}">${json.criticalCount}</div><div class="stat-lbl">Critical / Major</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${orc}">${json.overallRisk}</div><div class="stat-lbl">Overall Risk</div></div>
+    </div>`;
+    (json.interactions||[]).forEach(ix => {
+      const sc = sevColor(ix.severity);
+      html+=`<div class="card" style="border-left:3px solid ${sc}">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span style="font-weight:600;font-size:13.5px">${(ix.drugs||[]).join(' ↔ ')}</span>${badge(ix.severity,sc)}
+        </div>
+        <div class="grid2">
+          <div><label class="lbl">Effect</label><p style="font-size:12px">${ix.effect}</p></div>
+          <div><label class="lbl">Mechanism</label><p style="font-size:12px">${ix.mechanism}</p></div>
+        </div>
+        <div style="margin-top:8px"><label class="lbl">Management</label><p style="font-size:12px">${ix.management}</p></div>
+      </div>`;
+    });
+    if(json.generalAdvice) html+=`<div class="card" style="background:${C.green}0d;border:1px solid ${C.green}33"><label class="lbl">Pharmacist Advice</label><p style="font-size:12.5px">${json.generalAdvice}</p></div>`;
+    setHTML('drug-result', html);
+  } catch(e){ setHTML('drug-result',`<div class="card"><p style="color:var(--red)">Check failed. Try again.</p></div>`); }
+  setHTML('drug-btn-icon','💊'); setHTML('drug-btn-txt','Check Interactions');
+  document.querySelector('.btn.amber').disabled = false;
+}
+
+// ══ MODULE 3 · IMMUNIZATION ══════════════════════════════════
+const VACCINES = [
+  {name:'BCG',age:'At birth',disease:'Tuberculosis'},
+  {name:'OPV 0',age:'At birth',disease:'Polio'},
+  {name:'OPV 1 + Penta 1',age:'6 weeks',disease:'Polio, DPT, HepB, Hib'},
+  {name:'OPV 2 + Penta 2',age:'10 weeks',disease:'Polio, DPT, HepB, Hib'},
+  {name:'OPV 3 + Penta 3',age:'14 weeks',disease:'Polio, DPT, HepB, Hib'},
+  {name:'Measles 1',age:'9 months',disease:'Measles'},
+  {name:'Vitamin A (1st)',age:'6 months',disease:'Vitamin A deficiency'},
+  {name:'Measles 2 + Rubella',age:'15–18 months',disease:'Measles, Rubella'},
+  {name:'DPT Booster',age:'18 months',disease:'Diphtheria, Pertussis, Tetanus'},
+  {name:'TT (Pregnant mothers)',age:'1st ANC visit',disease:'Neonatal Tetanus'},
+];
+
+function renderImmVaccines() {
+  let html = '';
+  VACCINES.forEach(v => {
+    const done = state.immScheduled.has(v.name);
+    html+=`<div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border:1px solid ${done?C.green+'44':'var(--border)'}">
+      <div><div style="font-weight:600;font-size:13px;margin-bottom:2px">${v.name}</div><div style="color:var(--muted);font-size:11px">${v.age} · ${v.disease}</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        ${done?badge('✓ Scheduled',C.green):''}
+        <button class="btn" id="imm-btn-${v.name.replace(/\s/g,'_')}" onclick="scheduleVaccine('${v.name}','${v.age}','${v.disease}')" ${done?'disabled':''} style="padding:6px 12px;font-size:11.5px">
+          ${done?'SMS Sent':'📱 Schedule SMS'}
+        </button>
+      </div>
+    </div>`;
+  });
+  setHTML('imm-vaccines', html);
+}
+
+async function scheduleVaccine(name, age, disease) {
+  const btnId = 'imm-btn-'+name.replace(/\s/g,'_');
+  const btn = document.getElementById(btnId);
+  if(btn){ btn.disabled=true; btn.innerHTML=spin()+'Sending…'; }
+  const child    = document.getElementById('imm-child')?.value || 'your baby';
+  const guardian = document.getElementById('imm-guardian')?.value || 'Dear Mother';
+  const phone    = document.getElementById('imm-phone')?.value || '+260 9XX XXX XXX';
+  try {
+    const msg = JSON.parse(await callAI(
+      `Generate warm Zambian SMS immunization reminders. Respond ONLY in JSON:{"sms":"under 160 chars","followUp":"48h follow-up under 160 chars"}`,
+      `Child:${child}, Guardian:${guardian}, Vaccine:${name} at ${age}, Protects:${disease}.`
+    ));
+    state.immScheduled.add(name);
+    state.immLog.push({label:name,msg:msg.sms,to:phone,time:now(),color:C.accent});
+    state.immLog.push({label:name+' Follow-up',msg:msg.followUp,to:phone,time:'48h later',color:C.purple});
+    renderImmVaccines();
+    renderImmLog();
+  } catch(e){ if(btn){ btn.disabled=false; btn.innerHTML='📱 Schedule SMS'; } }
+}
+
+function renderImmLog() {
+  if(!state.immLog.length){ setHTML('imm-smslog',''); return; }
+  let html=`<div class="card"><label class="lbl">SMS Outbox Log</label>`;
+  state.immLog.forEach(s => {
+    html+=`<div class="sms-item" style="border-left-color:${s.color}">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px">${badge(s.label,s.color)}<span style="color:var(--muted);font-size:10px">${s.to} · ${s.time}</span></div>
+      <p style="font-size:12px">"${s.msg}"</p></div>`;
+  });
+  html+=`</div>`;
+  setHTML('imm-smslog', html);
+}
+
+// ══ MODULE 4 · MATERNAL ══════════════════════════════════════
+const ANC_SCHED = [
+  {visit:'ANC 1',timing:'Before 12 weeks',purpose:'Booking history, blood tests, TT vaccination, iron/folic acid, HIV test, malaria prophylaxis (SP)',tri:1},
+  {visit:'ANC 2',timing:'20 weeks',purpose:'Anomaly scan, fetal movements, BP, urine dipstick, anaemia review',tri:2},
+  {visit:'ANC 3',timing:'26 weeks',purpose:'GDM screening (OGTT), growth scan, anti-D if Rh negative, repeat FBC',tri:2},
+  {visit:'ANC 4',timing:'30 weeks',purpose:'Fetal position, symphysis-fundal height, BP, review results, birth plan intro',tri:3},
+  {visit:'ANC 5',timing:'34 weeks',purpose:'Repeat FBC, presentation, birth preparedness, danger signs education',tri:3},
+  {visit:'ANC 6',timing:'36 weeks',purpose:'Group B strep, engagement of head, hospital bag, PMTCT review',tri:3},
+  {visit:'ANC 7',timing:'38 weeks',purpose:'Confirm engagement, signs of labour, BP, protein, fetal movements',tri:3},
+  {visit:'ANC 8',timing:'40 weeks',purpose:'Post-dates discussion, induction options, Bishop score, maternal wellbeing',tri:3},
+];
+const PNC_SCHED = [
+  {visit:'PNC 1',timing:'Within 24 hours',purpose:'Breastfeeding initiation, cord care, Vitamin K & Hep B for newborn, APGAR, maternal BP'},
+  {visit:'PNC 2',timing:'Day 3',purpose:'Breastfeeding support, lochia check, uterine involution, neonatal jaundice, mood assessment'},
+  {visit:'PNC 3',timing:'Day 7',purpose:'Wound check, BP, EPDS depression screen, family planning, HIV prophylaxis for baby'},
+  {visit:'PNC 4',timing:'6 weeks',purpose:'Full maternal check, contraception, baby milestones, PAP smear reminder, return-to-work'},
+];
+const APPT_TYPES = ['Ultrasound Scan','Lab Test / Blood Work','OGTT (Glucose Tolerance)','Specialist Referral','Physiotherapy','Nutrition Counselling','Mental Health Review','Family Planning','PMTCT Follow-up','High-Risk OB Review','Emergency Follow-up','Other'];
+
+function matTab(tab, btn) {
+  state.matTab = tab;
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderMatContent();
+}
+
+function renderMatContent() {
+  const t = state.matTab;
+  const m = state.matMom;
+  let html = '';
+  if(t === 'register') {
+    html=`<div class="card">
+      <div style="color:var(--pink);font-size:11px;font-weight:600;margin-bottom:12px">PATIENT REGISTRATION</div>
+      <div class="grid2">
+        <div><label class="lbl">Mother's Name</label><input type="text" id="mm-name" value="${m.name}" oninput="matField('name',this.value)" placeholder="e.g. Grace Mwansa"/></div>
+        <div><label class="lbl">Age</label><input type="number" id="mm-age" value="${m.age}" oninput="matField('age',this.value)" placeholder="e.g. 26"/></div>
+        <div><label class="lbl">Phone (Zambia)</label><input type="text" id="mm-phone" value="${m.phone}" oninput="matField('phone',this.value)" placeholder="+260 9XX XXX XXX"/></div>
+        <div><label class="lbl">Facility</label><input type="text" id="mm-facility" value="${m.facility}" oninput="matField('facility',this.value)" placeholder="e.g. UTH, Kitwe Central"/></div>
+        <div><label class="lbl">Clinician</label><input type="text" id="mm-clinician" value="${m.clinician}" oninput="matField('clinician',this.value)" placeholder="e.g. Dr. Banda"/></div>
+        <div><label class="lbl">Gravida</label><input type="number" id="mm-gravida" value="${m.gravida}" oninput="matField('gravida',this.value)" placeholder="e.g. 2"/></div>
+        <div><label class="lbl">Para</label><input type="number" id="mm-para" value="${m.para}" oninput="matField('para',this.value)" placeholder="e.g. 1"/></div>
+        <div><label class="lbl">LMP (Last Menstrual Period)</label><input type="date" id="mm-lmp" value="${m.lmp}" oninput="matField('lmp',this.value)"/></div>
+      </div>
+      ${m.lmp?`<div class="grid2" style="margin-top:14px">
+        <div style="background:var(--pink)11;border:1px solid var(--pink)33;border-radius:10px;padding:14px;text-align:center"><label class="lbl">Estimated Delivery Date</label><div style="color:var(--pink);font-size:17px;font-weight:800;font-family:'Syne',sans-serif">${edd(m.lmp)}</div></div>
+        <div style="background:var(--accent)11;border:1px solid var(--accent)33;border-radius:10px;padding:14px;text-align:center"><label class="lbl">Gestational Age</label><div style="color:var(--accent);font-size:17px;font-weight:800;font-family:'Syne',sans-serif">${ga(m.lmp)}</div></div>
+      </div>`:''}
+      ${m.name?`<div style="background:var(--green)08;border:1px solid var(--green)33;border-radius:9px;padding:12px;margin-top:12px"><div style="color:var(--green);font-size:11px;font-weight:600;margin-bottom:4px">✓ PATIENT REGISTERED</div><p style="font-size:12px;color:var(--muted)">Go to ANC Visits or PNC Visits to schedule appointments and SMS reminders for ${m.name}.</p></div>`:''}
+    </div>`;
+  } else if(t === 'anc') {
+    html=`<div class="card" style="background:var(--pink)06;border:1px solid var(--pink)22;padding:12px 16px;margin-bottom:10px"><p style="font-size:12px;color:var(--muted)">WHO recommends <strong style="color:var(--text)">8+ ANC contacts</strong>. Each button generates booking SMS, 24h reminder, post-visit follow-up, and health tip.</p></div>`;
+    ANC_SCHED.forEach(v=>{
+      const done = state.matDoneANC.has(v.visit);
+      const tc = triColor(v.tri);
+      html+=`<div class="card" style="border-left:3px solid ${tc};padding:13px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:5px;align-items:center">
+              <span style="font-weight:700;font-size:13.5px">${v.visit}</span>
+              ${badge('T'+v.tri,tc)} ${badge(v.timing,C.muted)}
+            </div>
+            <p style="font-size:11.5px;color:var(--muted);line-height:1.5">${v.purpose}</p>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center">
+            ${done?badge('✓ Sent',C.green):''}
+            <button class="btn pink" id="anc-btn-${v.visit.replace(/\s/g,'_')}" onclick="scheduleVisit('${v.visit}','${v.timing}','${v.purpose}','anc')" ${done?'disabled':''} style="padding:6px 12px;font-size:11.5px">${done?'Sent':'📱 Schedule'}</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  } else if(t === 'pnc') {
+    html=`<div class="card" style="background:var(--green)06;border:1px solid var(--green)22;padding:12px 16px;margin-bottom:10px"><p style="font-size:12px;color:var(--muted)">Postnatal care is critical for mother and newborn. Each visit generates 4 AI SMS messages.</p></div>`;
+    PNC_SCHED.forEach(v=>{
+      const done = state.matDonePNC.has(v.visit);
+      html+=`<div class="card" style="border-left:3px solid var(--green);padding:13px 16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <div style="flex:1">
+            <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:5px;align-items:center">
+              <span style="font-weight:700;font-size:13.5px">${v.visit}</span>${badge(v.timing,C.green)}
+            </div>
+            <p style="font-size:11.5px;color:var(--muted);line-height:1.5">${v.purpose}</p>
+          </div>
+          <div style="display:flex;gap:7px;align-items:center">
+            ${done?badge('✓ Sent',C.green):''}
+            <button class="btn" id="pnc-btn-${v.visit.replace(/\s/g,'_')}" onclick="scheduleVisit('${v.visit}','${v.timing}','${v.purpose}','pnc')" ${done?'disabled':''} style="padding:6px 12px;font-size:11.5px">${done?'Sent':'📱 Schedule'}</button>
+          </div>
+        </div>
+      </div>`;
+    });
+  } else if(t === 'custom') {
+    html=`<div class="card">
+      <div style="color:var(--pink);font-size:11px;font-weight:600;margin-bottom:12px">CUSTOM APPOINTMENT & SMS REMINDER</div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div><label class="lbl">Appointment Type</label><select id="cust-type"><option value="">Select type…</option>${APPT_TYPES.map(t=>`<option>${t}</option>`).join('')}</select></div>
+        <div><label class="lbl">Date</label><input type="date" id="cust-date"/></div>
+        <div><label class="lbl">Time</label><input type="time" id="cust-time"/></div>
+        <div><label class="lbl">Reason / Indication</label><input type="text" id="cust-reason" placeholder="e.g. Elevated BP follow-up"/></div>
+      </div>
+      <label class="lbl">Preparation Notes</label>
+      <textarea id="cust-notes" rows="2" placeholder="e.g. Fast 8hrs, bring previous scan reports…" style="margin-bottom:12px"></textarea>
+      <button class="btn pink" id="cust-btn" onclick="sendCustomAppt()">📅 Schedule & Send Reminder</button>
+    </div>
+    ${state.matCustLog.map(a=>`<div class="card" style="border-left:3px solid var(--pink)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-weight:600">${a.type}</span>${badge('Scheduled',C.pink)}
+      </div>
+      ${[['📱 Booking',a.sms,C.pink],['⏰ Reminder',a.reminder,C.amber],['📋 Prep',a.preparation,C.purple]].map(([l,m,c])=>`<div style="background:var(--surface);border-radius:7px;padding:9px;margin-bottom:5px"><div style="color:${c};font-size:10px;font-weight:600;margin-bottom:3px">${l}</div><p style="font-size:12px">"${m}"</p></div>`).join('')}
+    </div>`).join('')}`;
+  } else if(t === 'smslog') {
+    const total = state.matSmsLog.length + state.matCustLog.length*3;
+    if(!total) {
+      html=`<div class="card" style="text-align:center;padding:36px"><div style="font-size:36px;margin-bottom:8px">📭</div><p style="color:var(--muted)">No SMS messages yet. Schedule ANC, PNC or custom appointments.</p></div>`;
+    } else {
+      html=`<div class="grid3" style="margin-bottom:10px">
+        <div class="stat-box"><div class="stat-val" style="color:var(--accent)">${total}</div><div class="stat-lbl">Total SMS</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--pink)">${state.matDoneANC.size*4}</div><div class="stat-lbl">ANC Reminders</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green)">${state.matDonePNC.size*4}</div><div class="stat-lbl">PNC Reminders</div></div>
+      </div>`;
+      state.matSmsLog.forEach(s=>{html+=`<div class="sms-item" style="border-left-color:${s.color}">${badge(s.label,s.color)} <span style="color:var(--muted);font-size:10px;float:right">${s.to} · ${s.time}</span><p style="font-size:12px;margin-top:6px">"${s.msg}"</p></div>`;});
+    }
+  }
+  setHTML('mat-content', html);
+  const total = state.matSmsLog.length + state.matCustLog.length*3;
+  const tab = document.getElementById('mat-smslog-tab');
+  if(tab) tab.textContent = `💬 SMS Log (${total})`;
+}
+
+function matField(k,v){ state.matMom[k]=v; }
+
+async function scheduleVisit(visit, timing, purpose, type) {
+  const btnId = (type==='anc'?'anc':'pnc')+'-btn-'+visit.replace(/\s/g,'_');
+  const btn = document.getElementById(btnId);
+  if(btn){ btn.disabled=true; btn.innerHTML=spin()+'Sending…'; }
+  const m = state.matMom;
+  try {
+    const msg = JSON.parse(await callAI(
+      `Generate warm Zambian maternal health SMS appointment reminders. Respond ONLY in JSON:{"appointmentSMS":"booking under 160 chars","reminderSMS":"24h-before under 160 chars","postVisitSMS":"post-visit follow-up under 160 chars","healthTip":"health tip under 120 chars"}`,
+      `Mother:${m.name||'Dear Mother'}, G${m.gravida||'?'}P${m.para||'?'}, GA:${ga(m.lmp)||'?'}, EDD:${edd(m.lmp)||'?'}, Facility:${m.facility||'the clinic'}, Visit:${visit} at ${timing}, Purpose:${purpose}.`
+    ));
+    if(type==='anc') state.matDoneANC.add(visit); else state.matDonePNC.add(visit);
+    const phone = m.phone || '+260 9XX';
+    state.matSmsLog.push(
+      {label:`${visit} – Booking`,msg:msg.appointmentSMS,to:phone,time:now(),color:C.pink},
+      {label:`${visit} – 24h Reminder`,msg:msg.reminderSMS,to:phone,time:'24h before',color:C.amber},
+      {label:`${visit} – Post-Visit`,msg:msg.postVisitSMS,to:phone,time:'After visit',color:C.green},
+      {label:`${visit} – Health Tip`,msg:msg.healthTip,to:phone,time:'With booking',color:C.accent},
+    );
+    renderMatContent();
+  } catch(e){ if(btn){ btn.disabled=false; btn.innerHTML='📱 Schedule'; } }
+}
+
+async function sendCustomAppt() {
+  const type  = document.getElementById('cust-type')?.value;
+  const date  = document.getElementById('cust-date')?.value;
+  const time  = document.getElementById('cust-time')?.value;
+  const reason= document.getElementById('cust-reason')?.value;
+  const notes = document.getElementById('cust-notes')?.value;
+  if(!type||!date){ alert('Please select appointment type and date.'); return; }
+  const btn = document.getElementById('cust-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML=spin()+'Generating…'; }
+  const m = state.matMom;
+  try {
+    const msg = JSON.parse(await callAI(
+      `Generate Zambian maternal health appointment SMS. Respond ONLY in JSON:{"sms":"booking under 160 chars","reminder":"day-before under 160 chars","preparation":"prep instructions under 120 chars"}`,
+      `Mother:${m.name||'Dear Mother'}, Appt:${type}, Date:${date}, Time:${time||'TBC'}, Facility:${m.facility||'clinic'}, Reason:${reason||'routine'}, Notes:${notes||'none'}.`
+    ));
+    state.matCustLog.push({type, date, time, reason, notes, ...msg, to:m.phone||'+260 9XX', sentAt:now()});
+    renderMatContent();
+  } catch(e){ if(btn){ btn.disabled=false; btn.innerHTML='📅 Schedule & Send Reminder'; } }
+}
+
+// ══ MODULE 5 · CHAT ══════════════════════════════════════════
+const DOCTORS = [
+  {id:1,name:'Dr. Aisha Banda',spec:'Gynaecology & Obstetrics',status:'online',av:'👩‍⚕️'},
+  {id:2,name:'Dr. James Mwale',spec:'Internal Medicine',status:'online',av:'👨‍⚕️'},
+  {id:3,name:'Dr. Fatima Phiri',spec:'Oncology',status:'busy',av:'👩‍⚕️'},
+  {id:4,name:'Dr. Peter Tembo',spec:'Pharmacology',status:'offline',av:'👨‍⚕️'},
+];
+const stColor = s => ({online:C.green,busy:C.amber,offline:C.muted})[s];
+
+function renderChat() {
+  if(!state.chatDoctor) state.chatDoctor = DOCTORS[0];
+  let dlist='';
+  DOCTORS.forEach(d=>{
+    const sel = state.chatDoctor?.id===d.id;
+    dlist+=`<div class="doc-card ${sel?'sel':''}" onclick="selectDoc(${d.id})">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+        <span style="font-size:18px">${d.av}</span>
+        <div><div style="font-size:12px;font-weight:600">${d.name}</div><div style="font-size:10.5px;color:var(--muted)">${d.spec}</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <div style="width:6px;height:6px;border-radius:50%;background:${stColor(d.status)}"></div>
+        <span style="font-size:10.5px;color:${stColor(d.status)};text-transform:capitalize">${d.status}</span>
+      </div>
+    </div>`;
+  });
+  setHTML('doc-list', dlist);
+  const d = state.chatDoctor;
+  setHTML('chat-header',`<span style="font-size:22px">${d.av}</span><div><div style="font-weight:600;font-size:13.5px">${d.name}</div><div style="font-size:11px;color:var(--muted)">${d.spec}</div></div><div style="margin-left:auto;display:flex;align-items:center;gap:5px"><div style="width:7px;height:7px;border-radius:50%;background:${stColor(d.status)}"></div><span style="font-size:11px;color:${stColor(d.status)};text-transform:capitalize">${d.status}</span></div>`);
+  renderMessages();
+}
+
+function selectDoc(id) {
+  state.chatDoctor = DOCTORS.find(d=>d.id===id);
+  renderChat();
+}
+
+function renderMessages() {
+  const msgs = state.chatHistory[state.chatDoctor?.id] || [];
+  const wrap = document.getElementById('chat-messages');
+  if(!wrap) return;
+  if(!msgs.length){ wrap.innerHTML=`<div class="chat-empty">Start a consultation with ${state.chatDoctor?.name}</div>`; return; }
+  wrap.innerHTML = msgs.map(m=>`<div style="display:flex;justify-content:${m.role==='user'?'flex-end':'flex-start'}">
+    <div class="chat-bubble ${m.role==='user'?'user':'ai'}">
+      ${m.content}
+      <div class="chat-time">${m.time}</div>
+    </div>
+  </div>`).join('');
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  if(!input?.value.trim() || state.chatLoading) return;
+  const q = input.value; input.value='';
+  const id = state.chatDoctor?.id;
+  if(!state.chatHistory[id]) state.chatHistory[id]=[];
+  state.chatHistory[id].push({role:'user',content:q,time:now()});
+  state.chatLoading=true;
+  document.getElementById('chat-send-btn').disabled=true;
+  renderMessages();
+  // Typing indicator
+  const wrap = document.getElementById('chat-messages');
+  const typing = document.createElement('div');
+  typing.id='typing-indicator'; typing.innerHTML=`<span class="spinner"></span><span style="color:var(--muted);font-size:12px;margin-left:8px">${state.chatDoctor?.name} is typing…</span>`;
+  typing.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 0';
+  wrap?.appendChild(typing); wrap.scrollTop=wrap.scrollHeight;
+  try {
+    const d = state.chatDoctor;
+    const hist = state.chatHistory[id].slice(0,-1);
+    const ctx  = hist.map(h=>`${h.role==='user'?'Colleague':d.name}: ${h.content}`).join('\n');
+    const text = await callAI(
+      `You are ${d.name}, specialist in ${d.spec} at a Zambian referral hospital. Clinical peer consultation chat. Be professional, evidence-based, practical. Reference Zambia MoH guidelines where relevant. Sign as Dr. ${d.name.split(' ').pop()}.`,
+      ctx + (ctx?'\n':'') + `Colleague: ${q}`, 1000
+    );
+    state.chatHistory[id].push({role:'assistant',content:text,time:now()});
+  } catch(e){ state.chatHistory[id].push({role:'assistant',content:'I apologise, I was unable to process your message. Please try again.',time:now()}); }
+  document.getElementById('typing-indicator')?.remove();
+  state.chatLoading=false;
+  document.getElementById('chat-send-btn').disabled=false;
+  renderMessages();
+}
+
+// ══ MODULE 6 · SAFETY ════════════════════════════════════════
+function safetyTab(tab, btn) {
+  state.safetyTab = tab;
+  document.querySelectorAll('.sub-tab.red').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderSafety();
+}
+
+function renderSafety() {
+  const t = state.safetyTab;
+  let html='';
+  if(t==='report') {
+    html=`<div class="card">
+      <div style="color:var(--red);font-size:11px;font-weight:600;margin-bottom:12px">NEW INCIDENT REPORT</div>
+      <div class="grid2" style="margin-bottom:12px">
+        <div><label class="lbl">Date & Time of Incident</label><input type="datetime-local" id="si-date"/></div>
+        <div><label class="lbl">Ward / Department</label><input type="text" id="si-ward" placeholder="e.g. Maternity Ward, OPD, ICU"/></div>
+        <div><label class="lbl">Incident Type</label>
+          <select id="si-type"><option value="">Select type…</option>${['Medication Error','Fall','Pressure Injury','Surgical Complication','Misidentification','Delayed Diagnosis','Equipment Failure','Infection / HAI','Communication Failure','Documentation Error','Other'].map(v=>`<option>${v}</option>`).join('')}</select></div>
+        <div><label class="lbl">Severity</label>
+          <select id="si-severity"><option value="">Select severity…</option>${['Near Miss','Minor','Moderate','Major','Catastrophic'].map(v=>`<option>${v}</option>`).join('')}</select></div>
+        <div><label class="lbl">Patient Code (anonymised)</label><input type="text" id="si-patient" placeholder="e.g. PT-2024-001"/></div>
+        <div><label class="lbl">Discovered By (role)</label><input type="text" id="si-discovered" placeholder="e.g. Staff Nurse, Pharmacist"/></div>
+      </div>
+      <label class="lbl">Incident Description</label>
+      <textarea id="si-desc" rows="5" placeholder="Describe what happened, what was done, and the outcome. Include timeline and immediate actions taken…" style="margin-bottom:12px"></textarea>
+      <button class="btn red" id="si-btn" onclick="submitIncident()">🛡️ Submit & Analyse</button>
+    </div>`;
+  } else if(t==='analysis') {
+    if(!state.safetyLastAnalysis) {
+      html=`<div class="card" style="text-align:center;padding:36px"><div style="font-size:36px;margin-bottom:8px">🔍</div><p style="color:var(--muted)">Submit an incident report to see AI root cause analysis here.</p></div>`;
+    } else {
+      const a = state.safetyLastAnalysis;
+      const pc = ({Low:C.green,Medium:C.amber,High:C.red,Critical:'#ff0044'})[a.priority]||C.muted;
+      html=`<div class="grid3" style="margin-bottom:12px">
+        <div class="stat-box"><div class="stat-val" style="color:${pc}">${a.priority}</div><div class="stat-lbl">Priority</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--accent);font-size:16px">${(a.classification||'').split(' ').slice(0,2).join(' ')||'—'}</div><div class="stat-lbl">Classification</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:${a.reportToAuthority?C.red:C.green}">${a.reportToAuthority?'YES':'No'}</div><div class="stat-lbl">Report to Authority</div></div>
+      </div>`;
+      [['⚡ Immediate Actions',a.immediateActions,C.red],['🔍 Contributing Factors',a.contributingFactors,C.amber],['🌱 Root Causes',a.rootCauses,C.orange],['⚙️ System Issues',a.systemIssues,C.purple],['✅ Corrective Actions',a.correctiveActions,C.green],['🛡️ Prevention',a.preventionStrategies,C.accent]].forEach(([title,items,color])=>{
+        html+=`<div class="card" style="border-left:3px solid ${color}"><div style="color:${color};font-size:11.5px;font-weight:600;margin-bottom:8px">${title}</div>${(items||[]).map(i=>`<div style="font-size:12px;margin-bottom:4px;display:flex;gap:6px"><span style="color:${color}">▸</span>${i}</div>`).join('')}</div>`;
+      });
+    }
+  } else {
+    const log = document.getElementById('safety-log-tab');
+    if(log) log.textContent = `📁 Incident Log (${state.safetyIncidents.length})`;
+    if(!state.safetyIncidents.length) {
+      html=`<div class="card" style="text-align:center;padding:36px"><div style="font-size:36px;margin-bottom:8px">📁</div><p style="color:var(--muted)">No incidents logged yet.</p></div>`;
+    } else {
+      state.safetyIncidents.forEach(inc=>{
+        const sc=sevColor(inc.severity);
+        html+=`<div class="card" style="border-left:3px solid ${sc}">
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px;flex-wrap:wrap;gap:5px">
+            <span style="font-weight:600;font-size:13px">${inc.type}</span>
+            <div style="display:flex;gap:5px">${badge(inc.severity,sc)} ${badge(inc.analysis?.priority||'—',({Low:C.green,Medium:C.amber,High:C.red,Critical:'#ff0044'})[inc.analysis?.priority]||C.muted)}</div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:5px">${inc.desc.slice(0,120)}${inc.desc.length>120?'…':''}</p>
+          <div style="font-size:10px;color:var(--muted)">${inc.ward} · ${inc.reportedAt}</div>
+        </div>`;
+      });
+    }
+  }
+  setHTML('safety-content',html);
+}
+
+async function submitIncident() {
+  const type = document.getElementById('si-type')?.value;
+  const desc = document.getElementById('si-desc')?.value?.trim();
+  if(!type||!desc){ alert('Please fill in incident type and description.'); return; }
+  const btn=document.getElementById('si-btn');
+  if(btn){btn.disabled=true;btn.innerHTML=spin()+'Analysing…';}
+  try {
+    const json=JSON.parse(await callAI(
+      `You are a patient safety officer in Zambia. Root cause analysis. Respond ONLY in JSON:
+{"immediateActions":["..."],"contributingFactors":["..."],"rootCauses":["..."],"systemIssues":["..."],"correctiveActions":["..."],"preventionStrategies":["..."],"reportToAuthority":true,"classification":"...","priority":"Low|Medium|High|Critical"}`,
+      `Ward:${document.getElementById('si-ward')?.value||'?'} Type:${type} Severity:${document.getElementById('si-severity')?.value||'?'}\nDesc:${desc}`
+    ));
+    state.safetyLastAnalysis=json;
+    state.safetyIncidents.unshift({type,desc,ward:document.getElementById('si-ward')?.value||'?',severity:document.getElementById('si-severity')?.value||'?',analysis:json,reportedAt:new Date().toLocaleString()});
+    const tab=document.getElementById('safety-log-tab');
+    if(tab) tab.textContent=`📁 Incident Log (${state.safetyIncidents.length})`;
+    state.safetyTab='analysis';
+    document.querySelectorAll('.sub-tab.red').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.sub-tab.red')[1]?.classList.add('active');
+    renderSafety();
+  } catch(e){if(btn){btn.disabled=false;btn.innerHTML='🛡️ Submit & Analyse';}}
+}
+
+// ══ MODULE 7 · AUDIT ═════════════════════════════════════════
+const AUDIT_STDS = {
+  'Maternity Care':['ANC card present and updated','Blood pressure recorded at every visit','HIV test offered and documented','PMTCT protocol initiated if HIV+','Malaria prophylaxis given (IPT/SP)','Tetanus toxoid vaccination documented','Birth plan documented','Partograph used during labour','Active management of 3rd stage done','Postnatal review within 24hrs'],
+  'Outpatient / OPD':['Patient triaged on arrival','Vital signs recorded','Diagnosis documented with ICD code','Treatment plan documented','Drug allergies checked','Patient educated on medication','Follow-up appointment given','Referral documented if needed'],
+  'Pharmacy / Medicines':['Prescription legible and complete','Dose and route correct','Drug interactions checked','Medication dispensed correctly','Expiry dates verified','Cold chain maintained','Patient counselled on medication use','Stock records updated'],
+  'Infection Prevention (IPC)':['Hand hygiene performed before patient contact','Hand hygiene performed after patient contact','PPE used appropriately','Sharps disposed safely','Waste segregated correctly','Sterilisation records maintained','Isolation precautions followed','Environmental cleaning documented'],
+};
+
+function renderAudit() {
+  const stds  = AUDIT_STDS[state.auditArea]||[];
+  const scores= state.auditScores;
+  const answered= stds.filter(s=>scores[state.auditArea+'|'+s]!==undefined).length;
+  const compliant= stds.filter(s=>scores[state.auditArea+'|'+s]==='yes').length;
+  const pct = answered>0 ? Math.round(compliant/stds.length*100) : 0;
+  const pc  = pct>=80?C.green:pct>=60?C.amber:C.red;
+  const a   = state.auditAuditor;
+
+  let html=`<div class="card">
+    <div class="grid2" style="margin-bottom:12px">
+      <div><label class="lbl">Auditor Name</label><input type="text" id="au-name" value="${a.name}" oninput="auField('name',this.value)" placeholder="e.g. Sr. Chilufya"/></div>
+      <div><label class="lbl">Facility</label><input type="text" id="au-fac" value="${a.facility}" oninput="auField('facility',this.value)" placeholder="e.g. Ndola Central Hospital"/></div>
+      <div><label class="lbl">Ward / Area</label><input type="text" id="au-ward" value="${a.ward}" oninput="auField('ward',this.value)" placeholder="e.g. Maternity Ward A"/></div>
+      <div><label class="lbl">Date of Audit</label><input type="date" id="au-date" value="${a.date}" oninput="auField('date',this.value)"/></div>
+    </div>
+    <label class="lbl">Audit Area</label>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+      ${Object.keys(AUDIT_STDS).map(ar=>`<button onclick="setAuditArea('${ar}')" style="background:${state.auditArea===ar?C.teal+'22':'var(--surface)'};color:${state.auditArea===ar?C.teal:C.muted};border:1px solid ${state.auditArea===ar?C.teal+'55':'var(--border)'};border-radius:7px;padding:5px 12px;cursor:pointer;font-family:'Inter',sans-serif;font-size:12px;transition:all .2s">${ar}</button>`).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--muted)">${answered}/${stds.length} answered · <span style="color:${pc};font-weight:600">${pct}% compliant</span></div>
+      <div style="width:48px;height:48px;border-radius:50%;border:3px solid ${pc};background:${pc}11;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:${pc};font-family:'Syne',sans-serif">${pct}%</div>
+    </div>
+    ${stds.map(std=>{
+      const k=state.auditArea+'|'+std; const v=scores[k];
+      return `<div class="audit-row"><span>${std}</span><div class="audit-btns">
+        ${[['yes','✓',C.green],['no','✗',C.red],['na','N/A',C.muted]].map(([val,l,c])=>`<button class="audit-opt ${v===val?val:''}" onclick="auScore('${k}','${val}')">${l}</button>`).join('')}
+      </div></div>`;
+    }).join('')}
+    <div style="margin-top:12px">
+      <button class="btn teal" id="au-btn" onclick="generateAuditReport()" ${answered<3?'disabled':''}>📋 Generate AI Audit Report</button>
+    </div>
+  </div>`;
+
+  if(state.auditResult) {
+    const r=state.auditResult;
+    html+=`<div class="card" style="background:${pc}0d;border:1px solid ${pc}33"><label class="lbl">Audit Summary</label><p style="font-size:12.5px;line-height:1.6">${r.summary}</p></div>
+    <div class="grid2">
+      <div class="card" style="border-left:3px solid ${C.green}"><div style="color:${C.green};font-size:11px;font-weight:600;margin-bottom:7px">✓ Strengths</div>${(r.strengths||[]).map(s=>`<div style="font-size:12px;margin-bottom:3px">• ${s}</div>`).join('')}</div>
+      <div class="card" style="border-left:3px solid ${C.red}"><div style="color:${C.red};font-size:11px;font-weight:600;margin-bottom:7px">✗ Gaps</div>${(r.gaps||[]).map(g=>`<div style="font-size:12px;margin-bottom:3px">• ${g}</div>`).join('')}</div>
+    </div>
+    <div class="card" style="border-left:3px solid ${C.teal}">
+      <div style="color:${C.teal};font-size:11px;font-weight:600;margin-bottom:7px">🎯 Priority Actions</div>
+      ${(r.priorityActions||[]).map((a,i)=>`<div style="font-size:12px;margin-bottom:5px;display:flex;gap:7px">${badge(i+1,C.teal)} ${a}</div>`).join('')}
+      ${r.timeframe?`<div style="margin-top:8px;font-size:11px;color:var(--muted)">Timeframe: ${r.timeframe}</div>`:''}
+    </div>`;
+  }
+  setHTML('audit-content', html);
+}
+
+function auField(k,v){ state.auditAuditor[k]=v; }
+function setAuditArea(a){ state.auditArea=a; state.auditResult=null; renderAudit(); }
+function auScore(k,v){ state.auditScores[k]=v; renderAudit(); }
+
+async function generateAuditReport() {
+  const btn=document.getElementById('au-btn');
+  if(btn){btn.disabled=true;btn.innerHTML=spin()+'Generating…';}
+  const stds=AUDIT_STDS[state.auditArea]||[];
+  const answered=stds.filter(s=>state.auditScores[state.auditArea+'|'+s]!==undefined).length;
+  const compliant=stds.filter(s=>state.auditScores[state.auditArea+'|'+s]==='yes').length;
+  const pct=answered>0?Math.round(compliant/stds.length*100):0;
+  const gaps=stds.filter(s=>state.auditScores[state.auditArea+'|'+s]==='no');
+  const a=state.auditAuditor;
+  try {
+    state.auditResult=JSON.parse(await callAI(
+      `Clinical quality auditor in Zambia. Respond ONLY in JSON:{"summary":"2-sentence summary","strengths":["..."],"gaps":["..."],"priorityActions":["...","...","..."],"timeframe":"...","qaScore":${pct}}`,
+      `Facility:${a.facility||'?'} Ward:${a.ward||state.auditArea} Auditor:${a.name||'?'} Date:${a.date||'today'}\nArea:${state.auditArea} Compliance:${pct}% (${compliant}/${stds.length})\nNon-compliant:${gaps.join('; ')||'None'}`
+    ));
+    renderAudit();
+  } catch(e){if(btn){btn.disabled=false;btn.innerHTML='📋 Generate AI Audit Report';}}
+}
+
+// ══ MODULE 8 · MDR ═══════════════════════════════════════════
+const DELAYS_LIST=['Delay 1: Decision to seek care','Delay 2: Reaching the facility','Delay 3: Receiving adequate care'];
+
+function renderMDR() {
+  let html=`<div class="card" style="background:var(--red)06;border:1px solid var(--red)22;padding:12px 16px;margin-bottom:10px"><p style="font-size:12px;color:var(--muted)">⚠ All maternal deaths must be reviewed. Data is anonymised for quality improvement only.</p></div>
+  <div class="card">
+    <div style="color:var(--pink);font-size:11px;font-weight:600;margin-bottom:12px">CASE DETAILS</div>
+    <div class="grid3" style="margin-bottom:12px">
+      <div><label class="lbl">Facility</label><input type="text" id="mdr-fac" placeholder="e.g. Kitwe Central"/></div>
+      <div><label class="lbl">Date of Death</label><input type="date" id="mdr-date"/></div>
+      <div><label class="lbl">Maternal Age</label><input type="number" id="mdr-age" placeholder="e.g. 28"/></div>
+      <div><label class="lbl">Gravida</label><input type="number" id="mdr-grav" placeholder="e.g. 3"/></div>
+      <div><label class="lbl">Para</label><input type="number" id="mdr-para" placeholder="e.g. 2"/></div>
+      <div><label class="lbl">GA (weeks)</label><input type="number" id="mdr-ga" placeholder="e.g. 38"/></div>
+      <div><label class="lbl">Place of Death</label>
+        <select id="mdr-place"><option value="">Select…</option>${['Home','In transit','Health Post','Rural Health Centre','District Hospital','General Hospital','UTH / Referral'].map(v=>`<option>${v}</option>`).join('')}</select></div>
+      <div><label class="lbl">Time from Admission to Death</label><input type="text" id="mdr-time" placeholder="e.g. 4 hours, DOA"/></div>
+      <div><label class="lbl">Avoidable?</label>
+        <select id="mdr-avoid"><option value="">Select…</option>${['Yes','Possibly','No','Unknown'].map(v=>`<option>${v}</option>`).join('')}</select></div>
+    </div>
+    <label class="lbl">Cause of Death (medical)</label>
+    <input type="text" id="mdr-cause" placeholder="e.g. Postpartum haemorrhage secondary to uterine atony, Eclampsia, Sepsis…" style="margin-bottom:12px"/>
+    <label class="lbl">Three Delays — Select all that apply</label>
+    <div style="margin-bottom:12px">
+      ${DELAYS_LIST.map(d=>`<div class="delay-row ${state.mdrDelays.has(d)?'sel':''}" onclick="toggleDelay('${d}')">
+        <div class="delay-check ${state.mdrDelays.has(d)?'sel':''}">${state.mdrDelays.has(d)?'✓':''}</div>${d}
+      </div>`).join('')}
+    </div>
+    <div class="grid2" style="margin-bottom:12px">
+      <div><label class="lbl">ANC History</label><textarea id="mdr-anc" rows="2" placeholder="e.g. 4 ANC visits, no complications…"></textarea></div>
+      <div><label class="lbl">Labour / Intrapartum Care</label><textarea id="mdr-labour" rows="2" placeholder="e.g. Prolonged labour, partograph not used…"></textarea></div>
+    </div>
+    <label class="lbl">Case Narrative Summary</label>
+    <textarea id="mdr-summary" rows="5" placeholder="Summarise the full clinical course from admission to death, including key decision points and interventions…" style="margin-bottom:12px"></textarea>
+    <button class="btn pink" id="mdr-btn" onclick="submitMDR()">🌸 Submit MDR for AI Review</button>
+  </div>`;
+
+  if(state.mdrResult) {
+    const r=state.mdrResult;
+    const av=r.avoidability?.split(' ')[0];
+    const avc=({Avoidable:C.red,Possibly:C.amber,Not:C.green})[av]||C.muted;
+    const pc=({Immediate:'#ff0044',Urgent:C.red,Routine:C.amber})[r.priority]||C.muted;
+    html+=`<div class="grid3" style="margin-bottom:12px">
+      <div class="stat-box"><div class="stat-val" style="color:${avc}">${av||'—'}</div><div class="stat-lbl">Avoidability</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${pc}">${r.priority}</div><div class="stat-lbl">Priority</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:${r.reportToNationalMDR?C.red:C.muted}">${r.reportToNationalMDR?'YES':'No'}</div><div class="stat-lbl">Report National</div></div>
+    </div>`;
+    [['🔍 Cause of Death',[r.causeOfDeath],C.red],['⏱ Three Delays Identified',r.threeDelaysIdentified,C.orange],['🔗 Contributing Factors',r.contributingFactors,C.amber],['⚙️ System Failures',r.systemFailures,C.purple],['✅ Recommendations',r.recommendations,C.green],['📚 Lessons Learned',r.lessonsLearned,C.accent]].forEach(([title,items,color])=>{
+      html+=`<div class="card" style="border-left:3px solid ${color}"><div style="color:${color};font-size:11px;font-weight:600;margin-bottom:7px">${title}</div>${(items||[]).map(i=>`<div style="font-size:12px;margin-bottom:4px;display:flex;gap:6px"><span style="color:${color}">▸</span>${i}</div>`).join('')}</div>`;
+    });
+  }
+
+  if(state.mdrSubmitted.length>0&&!state.mdrResult) {
+    html+=`<div class="card"><label class="lbl">MDR Cases Logged (${state.mdrSubmitted.length})</label>
+      ${state.mdrSubmitted.map(r=>`<div class="sms-item" style="border-left-color:var(--pink)"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-weight:600;font-size:12px">${r.cause.slice(0,60)}</span>${badge(r.analysis?.avoidability?.split(' ')[0]||'?',C.pink)}</div><div style="font-size:10px;color:var(--muted)">${r.facility} · ${r.date} · ${r.submittedAt}</div></div>`).join('')}
+    </div>`;
+  }
+  setHTML('mdr-content', html);
+}
+
+function toggleDelay(d){ if(state.mdrDelays.has(d)) state.mdrDelays.delete(d); else state.mdrDelays.add(d); renderMDR(); }
+
+async function submitMDR() {
+  const cause   = document.getElementById('mdr-cause')?.value?.trim();
+  const summary = document.getElementById('mdr-summary')?.value?.trim();
+  if(!cause||!summary){ alert('Please fill in cause of death and case summary.'); return; }
+  const btn=document.getElementById('mdr-btn');
+  if(btn){btn.disabled=true;btn.innerHTML=spin()+'Analysing…';}
+  const fac    = document.getElementById('mdr-fac')?.value;
+  const date   = document.getElementById('mdr-date')?.value;
+  const age    = document.getElementById('mdr-age')?.value;
+  const grav   = document.getElementById('mdr-grav')?.value;
+  const para   = document.getElementById('mdr-para')?.value;
+  const ga2    = document.getElementById('mdr-ga')?.value;
+  const place  = document.getElementById('mdr-place')?.value;
+  const time2  = document.getElementById('mdr-time')?.value;
+  const avoid  = document.getElementById('mdr-avoid')?.value;
+  const anc    = document.getElementById('mdr-anc')?.value;
+  const labour = document.getElementById('mdr-labour')?.value;
+  try {
+    const json=JSON.parse(await callAI(
+      `Zambia maternal death review committee chair. Respond ONLY in JSON:
+{"causeOfDeath":"...","threeDelaysIdentified":["..."],"avoidability":"Avoidable|Possibly Avoidable|Not Avoidable","contributingFactors":["..."],"systemFailures":["..."],"recommendations":["..."],"lessonsLearned":["..."],"reportToNationalMDR":true,"priority":"Routine|Urgent|Immediate"}`,
+      `Facility:${fac||'?'} Age:${age||'?'} G${grav||'?'}P${para||'?'} GA:${ga2||'?'}wks Place:${place||'?'} Time:${time2||'?'}\nCause:${cause}\nDelays:${[...state.mdrDelays].join('; ')||'Not identified'} Avoidable:${avoid||'?'}\nANC:${anc||'?'} Labour:${labour||'?'}\nSummary:${summary}`
+    ));
+    state.mdrResult=json;
+    state.mdrSubmitted.unshift({cause,facility:fac||'?',date:date||'?',analysis:json,submittedAt:new Date().toLocaleString()});
+    renderMDR();
+  } catch(e){if(btn){btn.disabled=false;btn.innerHTML='🌸 Submit MDR for AI Review';}}
+}
+
+// ══ MODULE 9 · FEEDBACK ══════════════════════════════════════
+const FB_Qs=[['q1','Quality of care received'],['q2','Staff attitude and communication'],['q3','Waiting time'],['q4','Cleanliness and environment'],['q5','Overall satisfaction']];
+const EMOJIS=['😞','😕','😐','🙂','😁'];
+
+function fbTab(tab, btn) {
+  state.fbTab=tab;
+  document.querySelectorAll('.sub-tab.zstar').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderFeedback();
+}
+
+function renderFeedback() {
+  const t=state.fbTab; const f=state.fbForm; const resp=state.fbResponses;
+  let html='';
+  if(t==='survey') {
+    html=`<div class="card">
+      <div style="color:var(--zgreen);font-size:11px;font-weight:600;margin-bottom:12px">PATIENT EXIT SURVEY</div>
+      <div class="grid3" style="margin-bottom:14px">
+        <div><label class="lbl">Facility</label><input type="text" id="fb-fac" value="${f.facility}" oninput="fbField('facility',this.value)" placeholder="e.g. Chipata General"/></div>
+        <div><label class="lbl">Ward / Service</label><input type="text" id="fb-ward" value="${f.ward}" oninput="fbField('ward',this.value)" placeholder="e.g. Maternity, OPD"/></div>
+        <div><label class="lbl">Date</label><input type="date" id="fb-date" value="${f.date}" oninput="fbField('date',this.value)"/></div>
+      </div>
+      ${FB_Qs.map(([k,q])=>`<div style="margin-bottom:14px">
+        <label class="lbl">${q}</label>
+        <div class="star-row">
+          ${[1,2,3,4,5].map(v=>`<button class="star-btn ${f[k]===String(v)?'sel':''}" onclick="fbScore('${k}','${v}')">
+            <div style="font-size:18px;margin-bottom:2px">${EMOJIS[v-1]}</div>${v}
+          </button>`).join('')}
+        </div>
+      </div>`).join('')}
+      <label class="lbl">Additional Comments</label>
+      <textarea id="fb-comments" rows="2" placeholder="What can we improve? What did we do well?" style="margin-bottom:12px">${f.comments}</textarea>
+      <button class="btn zgreen" id="fb-btn" onclick="submitFeedback()" ${FB_Qs.every(([k])=>f[k])?'':'disabled'}>⭐ Submit Feedback</button>
+    </div>`;
+  } else if(t==='results') {
+    const tab=document.getElementById('fb-results-tab');
+    if(tab) tab.textContent=`📊 Results (${resp.length})`;
+    if(!resp.length) {
+      html=`<div class="card" style="text-align:center;padding:36px"><div style="font-size:36px;margin-bottom:8px">📊</div><p style="color:var(--muted)">No responses yet. Collect patient feedback using the Survey tab.</p></div>`;
+    } else {
+      const avg=(resp.reduce((a,r)=>a+FB_Qs.reduce((s,[k])=>s+Number(r[k]||0),0)/FB_Qs.length,0)/resp.length).toFixed(1);
+      html=`<div class="grid3" style="margin-bottom:12px">
+        <div class="stat-box"><div class="stat-val" style="color:var(--zgreen)">${resp.length}</div><div class="stat-lbl">Total Responses</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--accent)">${avg}/5</div><div class="stat-lbl">Average Score</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green)">${resp.filter(r=>FB_Qs.every(([k])=>r[k]==='5')).length}</div><div class="stat-lbl">Top Score</div></div>
+      </div>`;
+      FB_Qs.forEach(([k,q])=>{
+        const a=resp.reduce((s,r)=>s+Number(r[k]||0),0)/resp.length;
+        const pct=a/5*100; const pc=pct>=70?C.green:pct>=50?C.amber:C.red;
+        html+=`<div class="card" style="padding:12px 16px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12.5px">${q}</span><span style="color:${pc};font-weight:700">${a.toFixed(1)}/5</span></div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pc}"></div></div></div>`;
+      });
+      const comments=resp.filter(r=>r.comments);
+      if(comments.length) html+=`<div class="card"><label class="lbl">Patient Comments</label>${comments.map(r=>`<div style="background:var(--surface);border-radius:7px;padding:9px;margin-bottom:5px;font-size:12px;font-style:italic">"${r.comments}"</div>`).join('')}</div>`;
+    }
+  } else {
+    if(resp.length<1) {
+      html=`<div class="card" style="text-align:center;padding:36px"><div style="font-size:36px;margin-bottom:8px">🤖</div><p style="color:var(--muted)">Collect at least 1 response to generate AI analysis.</p></div>`;
+    } else if(!state.fbAnalysis) {
+      html=`<div class="card" style="text-align:center;padding:30px"><p style="color:var(--muted);margin-bottom:14px">${resp.length} response${resp.length>1?'s':''} ready for AI analysis</p><button class="btn zgreen" id="fb-ai-btn" onclick="runFBAnalysis()">🤖 Run AI Sentiment Analysis</button></div>`;
+    } else {
+      const a=state.fbAnalysis;
+      const rc=({Poor:C.red,Fair:C.amber,Good:C.teal,'Very Good':C.green,Excellent:C.zgreen})[a.rating]||C.muted;
+      html=`<div class="grid2" style="margin-bottom:12px">
+        <div class="stat-box"><div class="stat-val" style="color:var(--zgreen)">${a.overallScore}</div><div class="stat-lbl">Overall Score</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:${rc};font-size:18px">${a.rating}</div><div class="stat-lbl">Rating</div></div>
+      </div>`;
+      [['💪 Top Strengths',a.topStrengths,C.green],['⚠ Top Complaints',a.topComplaints,C.red],['💬 Sentiment Themes',a.sentimentThemes,C.purple],['🚨 Urgent Actions',a.urgentActions,C.orange],['✅ QI Recommendations',a.recommendations,C.zgreen]].forEach(([title,items,color])=>{
+        html+=`<div class="card" style="border-left:3px solid ${color}"><div style="color:${color};font-size:11px;font-weight:600;margin-bottom:7px">${title}</div>${(items||[]).map(i=>`<div style="font-size:12px;margin-bottom:4px;display:flex;gap:6px"><span style="color:${color}">▸</span>${i}</div>`).join('')}</div>`;
+      });
+      if(a.trendInsight) html+=`<div class="card" style="background:var(--zgreen)0a;border:1px solid var(--zgreen)33"><label class="lbl">Trend Insight</label><p style="font-size:12.5px;line-height:1.6">${a.trendInsight}</p></div>`;
+      html+=`<button class="btn" onclick="state.fbAnalysis=null;renderFeedback()" style="margin-top:4px">↺ Re-analyse</button>`;
+    }
+  }
+  setHTML('fb-content', html);
+}
+
+function fbField(k,v){ state.fbForm[k]=v; }
+function fbScore(k,v){ state.fbForm[k]=v; renderFeedback(); }
+
+function submitFeedback() {
+  if(!FB_Qs.every(([k])=>state.fbForm[k])){ alert('Please answer all questions.'); return; }
+  state.fbResponses.push({...state.fbForm, id:Date.now(), submittedAt:now()});
+  state.fbForm = { facility:state.fbForm.facility, ward:state.fbForm.ward, date:state.fbForm.date, q1:'',q2:'',q3:'',q4:'',q5:'',comments:'' };
+  state.fbAnalysis = null;
+  const tab=document.getElementById('fb-results-tab');
+  if(tab) tab.textContent=`📊 Results (${state.fbResponses.length})`;
+  renderFeedback();
+}
+
+async function runFBAnalysis() {
+  const btn=document.getElementById('fb-ai-btn');
+  if(btn){btn.disabled=true;btn.innerHTML=spin()+'Analysing…';}
+  const summary=FB_Qs.map(([k,q])=>`${q}: avg ${(state.fbResponses.reduce((a,r)=>a+Number(r[k]||0),0)/state.fbResponses.length).toFixed(1)}/5`).join('; ');
+  const comments=state.fbResponses.filter(r=>r.comments).map(r=>r.comments).join(' | ');
+  try {
+    state.fbAnalysis=JSON.parse(await callAI(
+      `Healthcare quality analyst in Zambia. Respond ONLY in JSON:{"overallScore":"X.X/5","rating":"Poor|Fair|Good|Very Good|Excellent","topStrengths":["..."],"topComplaints":["..."],"sentimentThemes":["..."],"urgentActions":["..."],"recommendations":["..."],"trendInsight":"..."}`,
+      `Facility:${state.fbResponses[0]?.facility||'?'} Responses:${state.fbResponses.length}\nScores:${summary}\nComments:${comments||'None'}`
+    ));
+    renderFeedback();
+  } catch(e){if(btn){btn.disabled=false;btn.innerHTML='🤖 Run AI Sentiment Analysis';}}
+}
+
+// ══ INIT ═════════════════════════════════════════════════════
+buildNav();
+renderImmVaccines();
+renderMatContent();
+renderChat();
+renderSafety();
+renderAudit();
+renderMDR();
+renderFeedback();
+</script>
+</body>
+</html>
