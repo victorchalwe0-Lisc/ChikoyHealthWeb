@@ -272,9 +272,27 @@ textarea{resize:vertical}
 
 <script>
 // ══ CONFIG ════════════════════════════════════════════════════
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL   = 'claude-sonnet-4-20250514';
+async function askAI(message) {
+  try {
+    const res = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer AIzaSyDF78lGA0RezfzaEMNGjA6vD4bWFPRuwBU"
+      },
+      body: JSON.stringify({
+        model: "gpt-5",
+        input: "You are a clinical assistant. Answer safely: " + message
+      })
+    });
 
+    const data = await res.json();
+    return data.output_text || "No response";
+
+  } catch (err) {
+    return "Error: " + err.message;
+  }
+}
 // ══ STATE ════════════════════════════════════════════════════
 const state = {
   currentPage: 'cervical',
